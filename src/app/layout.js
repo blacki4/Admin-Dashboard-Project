@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SideBar from "./Components/SideBar";
+import Header from "./Components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +24,17 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SideBar />
-        {children}
+        <div className="flex flex-col">
+          <header>
+            <Header />
+          </header>
+          <div className="flex flex-1">
+            <aside>
+              <SideBar />
+            </aside>
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
