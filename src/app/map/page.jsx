@@ -2,8 +2,23 @@
 
 import { ResponsiveChoropleth } from "@nivo/geo";
 import { geo } from "./world_countries.jsx";
+import { useState, useMemo } from "react";
+import { Search, Filter, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 
 export default function Map() {
+  const [selectedRange, setSelectedRange] = useState([0, 1000000]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [projectionScale, setProjectionScale] = useState(145);
+
+  // إنشاء كائن لربط رموز الدول بأسمائها
+  const countryCodes = useMemo(() => {
+    const codes = {};
+    geo.features.forEach((feature) => {
+      codes[feature.id] = feature.properties.name;
+    });
+    return codes;
+  }, []);
+
   const mapData = [
     {
       id: "AFG",
@@ -689,26 +704,159 @@ export default function Map() {
       id: "KOR",
       value: 959265,
     },
-  ];
+  ].map((country) => ({
+    ...country,
+    name: countryCodes[country.id] || country.id,
+  }));
+
+  const filteredData = useMemo(() => {
+    let filtered = mapData.filter(
+      (country) =>
+        country.value >= selectedRange[0] && country.value <= selectedRange[1]
+    );
+
+    if (searchTerm) {
+      filtered = filtered.filter((country) =>
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [selectedRange, searchTerm, mapData]);
+
+  const zoomIn = () => setProjectionScale((prev) => Math.min(prev + 20, 300));
+  const zoomOut = () => setProjectionScale((prev) => Math.max(prev - 20, 80));
+  const resetZoom = () => setProjectionScale(145);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center bg-indigo-50 py-10">
-      <div className="w-[95%] max-w-7xl p-6 bg-white shadow-xl rounded-3xl">
-        <h1 className="text-3xl font-bold text-indigo-800 mb-8 text-center">
-          Global Programming Language Usage
-        </h1>
-        <div className="h-[700px]">
+    <div className="w-full flex flex-col justify-center items-center bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-10">
+      <div className="w-[95%] max-w-7xl bg-white rounded-3xl shadow-2xl p-6 animate-scale-in">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6">
+          <div className="text-center lg:text-left">
+            <h1 className="text-4xl font-bold text-indigo-800 mb-2">
+              Global Programming Language Usage
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Developer distribution and technology adoption worldwide
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-4 items-center">
+            {/* Search */}
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search countries..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="text-black pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="flex gap-2 bg-indigo-600 rounded-lg p-1">
+              <button
+                onClick={zoomOut}
+                className="p-2 hover:bg-indigo-700 rounded-md transition-colors"
+                title="Zoom Out"
+              >
+                <ZoomOut size={18} />
+              </button>
+              <button
+                onClick={resetZoom}
+                className="p-2 hover:bg-indigo-700 rounded-md transition-colors"
+                title="Reset Zoom"
+              >
+                <RotateCcw size={18} />
+              </button>
+              <button
+                onClick={zoomIn}
+                className="p-2 hover:bg-indigo-700 rounded-md transition-colors"
+                title="Zoom In"
+              >
+                <ZoomIn size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gray-50 p-4 rounded-xl">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Usage Range: {selectedRange[0].toLocaleString()} -{" "}
+              {selectedRange[1].toLocaleString()}
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="1000000"
+              step="10000"
+              value={selectedRange[1]}
+              onChange={(e) => setSelectedRange([0, parseInt(e.target.value)])}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0</span>
+              <span>250K</span>
+              <span>500K</span>
+              <span>750K</span>
+              <span>1M</span>
+            </div>
+          </div>
+
+          <div className="bg-indigo-50 p-4 rounded-xl">
+            <h3 className="font-semibold text-indigo-800 mb-2">
+              🌍 Map Legend
+            </h3>
+            <div className="flex items-center gap-2 text-sm">
+              <div className="flex gap-1">
+                <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                <div className="w-4 h-4 bg-blue-300 rounded"></div>
+                <div className="w-4 h-4 bg-blue-400 rounded"></div>
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <div className="w-4 h-4 bg-blue-700 rounded"></div>
+              </div>
+              <span className="text-gray-600">Low → High Usage</span>
+            </div>
+          </div>
+
+          <div className="bg-green-50 p-4 rounded-xl">
+            <h3 className="font-semibold text-green-800 mb-2">📊 Statistics</h3>
+            <div className="text-sm text-green-700">
+              Showing {filteredData.length} countries
+              <br />
+              Average:{" "}
+              {filteredData.length > 0
+                ? Math.round(
+                    filteredData.reduce((a, b) => a + b.value, 0) /
+                      filteredData.length
+                  ).toLocaleString()
+                : 0}
+            </div>
+          </div>
+        </div>
+
+        {/* Map Container */}
+        <div className="h-[700px] bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-4 border border-gray-200 relative">
           <ResponsiveChoropleth
-            data={mapData}
+            data={filteredData}
             features={geo.features}
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            colors="nivo"
+            colors={["#E5E7EB", "#93C5FD", "#60A5FA", "#3B82F6", "#1D4ED8"]}
             domain={[0, 1000000]}
-            unknownColor="#d1d5db"
+            unknownColor="#E5E7EB"
             label="properties.name"
-            projectionScale={145}
+            projectionScale={projectionScale}
             projectionTranslation={[0.5, 0.65]}
-            valueFormat=".2s"
+            projectionRotation={[0, 0, 0]}
+            enableGraticule={true}
+            graticuleLineColor="rgba(0, 0, 0, 0.1)"
             borderWidth={0.5}
             borderColor="#374151"
             legends={[
@@ -717,29 +865,144 @@ export default function Map() {
                 direction: "column",
                 justify: true,
                 translateX: 20,
-                translateY: -40,
+                translateY: -60,
                 itemsSpacing: 0,
-                itemWidth: 100,
+                itemWidth: 94,
                 itemHeight: 18,
                 itemDirection: "left-to-right",
-                itemTextColor: "#4b5563",
-                itemOpacity: 0.9,
+                itemOpacity: 0.85,
                 symbolSize: 18,
+                effects: [
+                  {
+                    on: "hover",
+                    style: {
+                      itemTextColor: "#000",
+                      itemOpacity: 1,
+                    },
+                  },
+                ],
               },
             ]}
-            tooltip={({ feature }) => (
-              <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-                <div className="text-indigo-700 font-semibold">
-                  {feature.properties.name}
+            theme={{
+              background: "transparent",
+              textColor: "#1E1B4B",
+              tooltip: {
+                container: {
+                  background: "#fff",
+                  color: "#111827",
+                  fontSize: 14,
+                  borderRadius: "12px",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                  border: "1px solid #E5E7EB",
+                  padding: "12px 16px",
+                },
+              },
+            }}
+            tooltip={({ feature }) => {
+              const countryData = mapData.find((d) => d.id === feature.id);
+              return (
+                <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 min-w-[200px]">
+                  <div className="font-bold text-indigo-700 text-lg mb-2">
+                    {feature.properties?.name}
+                  </div>
+                  {countryData ? (
+                    <>
+                      <div className="text-green-600 font-semibold text-xl">
+                        {countryData.value.toLocaleString()} developers
+                      </div>
+                      <div className="text-gray-500 text-sm mt-1">
+                        Rank: #
+                        {mapData
+                          .sort((a, b) => b.value - a.value)
+                          .findIndex((d) => d.id === feature.id) + 1}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-500">No data available</div>
+                  )}
                 </div>
-                <div className="text-green-600 font-medium">
-                  {feature.data?.value?.toLocaleString() ?? 0}
-                </div>
-              </div>
-            )}
+              );
+            }}
           />
+
+          {/* Map Overlay Controls */}
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+            <div className="text-sm font-semibold text-gray-700 mb-2">
+              Map Controls
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={() => setSelectedRange([0, 1000000])}
+                className="w-full text-left px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors"
+              >
+                Reset Filter
+              </button>
+              <button
+                onClick={() => setSearchTerm("")}
+                className="w-full text-left px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+              >
+                Clear Search
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Countries List */}
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            🏆 Top Countries by Usage
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {mapData
+              .sort((a, b) => b.value - a.value)
+              .slice(0, 8)
+              .map((country, index) => (
+                <div
+                  key={country.id}
+                  className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <span className="font-semibold text-gray-800">
+                        {country.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-700">
+                    {country.value.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-500">developers</div>
+                </div>
+              ))}
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #4f46e5;
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #4f46e5;
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+      `}</style>
     </div>
   );
 }

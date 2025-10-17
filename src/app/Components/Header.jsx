@@ -21,33 +21,43 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="flex justify-end">
-      <div className="flex bg-white h-[90px] justify-between items-center w-5/6">
-        <h1 className="text-black text-3xl ml-10">Dashboard</h1>
-        <SearchBar />
+    <div className="flex justify-end bg-gray-50">
+      <div className="flex bg-white h-[90px] justify-between items-center w-full px-6 shadow-sm border-b">
+        <h1 className="text-black text-3xl font-bold">Dashboard</h1>
+        <div className="flex-1 max-w-2xl mx-8">
+          <SearchBar />
+        </div>
         <div
-          className="flex gap-6 justify-center items-center mr-10 relative"
+          className="flex gap-4 justify-center items-center relative"
           ref={dropdownRef}
         >
           <img
-            className="size-17 rounded-full"
-            src="\Images\Portrait of a confident young smart looking man _ Premium AI-generated image.jpeg"
-            alt=""
+            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+            src="/Images/Portrait of a confident young smart looking man _ Premium AI-generated image.jpeg"
+            alt="Profile"
           />
-          <div className="-ml-4 flex flex-col justify-center items-center">
-            <h2 className="text-black text-lg">Malek</h2>
-            <p className="text-indigo-800">Admin</p>
+          <div className="flex flex-col justify-center items-start">
+            <h2 className="text-black text-lg font-semibold">Malek</h2>
+            <p className="text-indigo-600 text-sm">Admin</p>
           </div>
-          <div className="cursor-pointer" onClick={toggleDropdown}>
-            <KeyboardArrowDownIcon sx={{ color: "Black" }} />
+          <div
+            className="cursor-pointer transition-transform duration-200 hover:bg-gray-100 rounded-full p-1"
+            onClick={toggleDropdown}
+          >
+            <KeyboardArrowDownIcon
+              sx={{ color: "black" }}
+              className={`transition-transform duration-200 ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
           </div>
 
           {isOpen && (
-            <div className="absolute top-14 right-0 bg-white shadow-lg rounded-xl p-2 w-40 z-50 border">
-              <button className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg text-black">
+            <div className="absolute top-14 right-0 bg-white shadow-lg rounded-xl p-2 w-48 z-50 border animate-in fade-in slide-in-from-top-2 duration-200">
+              <button className="block w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors duration-200">
                 Settings
               </button>
-              <button className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg text-red-600">
+              <button className="block w-full text-left px-4 py-3 hover:bg-red-50 rounded-lg text-red-600 transition-colors duration-200">
                 Log out
               </button>
             </div>
