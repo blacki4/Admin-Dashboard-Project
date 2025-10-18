@@ -140,7 +140,7 @@ export default function Dashboard() {
             </h1>
             <p className="text-gray-500 text-xs sm:text-sm">Sales Summary</p>
           </div>
-          <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-indigo-800 border border-indigo-400 rounded-lg hover:bg-indigo-600 cursor-pointer transition-colors w-fit self-end sm:self-auto">
+          <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-indigo-600 border rounded-lg hover:bg-indigo-700 cursor-pointer transition-colors w-fit self-end sm:self-auto">
             <Download size={16} className="sm:w-4 sm:h-4" />
             <span className="text-sm sm:text-base">Export</span>
           </button>

@@ -1,5 +1,8 @@
 "use client";
 
+{
+  /* Icons */
+}
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import PersonIcon from "@mui/icons-material/Person";
@@ -7,11 +10,29 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import TimelineIcon from "@mui/icons-material/Timeline";
+
+{
+  /* Drawer Components */
+}
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import MapIcon from "@mui/icons-material/Map";
 import Link from "next/link";
+
+{
+  /* Hooks */
+}
 import { usePathname } from "next/navigation";
+import { useSidebar } from "./SideContext";
 
 export default function SideBar() {
+  const { isSideOpen, toggleMenu } = useSidebar();
   const pathname = usePathname();
 
   const sections = [
@@ -25,6 +46,73 @@ export default function SideBar() {
     { title: "Map", icon: MapIcon, href: "/map" },
   ];
 
+  {
+    /* The Drawer For Mobile Screens */
+  }
+  const DrawerList = (
+    <Box sx={{ width: 280 }} role="presentation" onClick={toggleMenu}>
+      <div className="flex gap-3 items-center p-4 border-b">
+        <img
+          src="/Images/download-removebg-preview.png"
+          alt="Logo"
+          className="w-10 h-10"
+        />
+        <h1 className="text-black text-xl font-bold">DaM Board</h1>
+      </div>
+
+      <List>
+        {sections.map((section, index) => {
+          const Icon = section.icon;
+          const isActive = pathname === section.href;
+
+          return (
+            <Link key={index} href={section.href}>
+              <ListItem disablePadding>
+                <ListItemButton className={isActive ? "bg-indigo-100" : ""}>
+                  <ListItemIcon>
+                    <Icon
+                      className={isActive ? "text-indigo-600" : "text-gray-600"}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={section.title}
+                    className={
+                      isActive ? "text-indigo-600 font-medium" : "text-gray-700"
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          );
+        })}
+      </List>
+      <Divider />
+
+      {/* The Pro Card In The Drawer */}
+      <div className="p-4">
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 flex flex-col justify-center items-center gap-3 rounded-2xl p-4 shadow-lg">
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <span className="text-white text-lg font-bold">★</span>
+          </div>
+          <h1 className="text-white text-lg font-bold text-center">
+            Dam Board Pro
+          </h1>
+          <p className="text-gray-200 text-xs text-center">
+            Get access to all features
+          </p>
+          <Link href="/get-pro">
+            <button className="py-2 px-4 bg-white text-indigo-600 rounded-lg font-semibold cursor-pointer hover:bg-gray-100 transition-colors duration-300 shadow-md text-sm">
+              Get Pro
+            </button>
+          </Link>
+        </div>
+      </div>
+    </Box>
+  );
+
+  {
+    /* Main SideBar For Large Screens */
+  }
   const displayTitle = sections.map((sec, index) => {
     const Icon = sec.icon;
     const isActive = pathname === sec.href;
@@ -34,7 +122,7 @@ export default function SideBar() {
         <div
           className={`flex gap-3 rounded-xl p-4 w-[250px] cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
             isActive
-              ? "bg-indigo-600 text-white shadow-lg"
+              ? "bg-indigo-600 text-white shadow-lg translate-x-2.5"
               : "bg-white text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
           }`}
         >
@@ -46,7 +134,7 @@ export default function SideBar() {
   });
 
   return (
-    <div className="w-80 flex flex-col items-center gap-6 bg-white h-screen py-8 sticky top-0 shadow-lg">
+    <div className="w-80 flex flex-col items-center gap-6 bg-white h-screen py-8 sticky top-0 shadow-lg max-xl:hidden">
       {/* Logo Section */}
       <div className="flex gap-3 items-center mb-4 px-6">
         <img
@@ -77,6 +165,11 @@ export default function SideBar() {
           </button>
         </Link>
       </div>
+
+      {/* Drawer */}
+      <Drawer open={isSideOpen} onClose={toggleMenu}>
+        {DrawerList}
+      </Drawer>
     </div>
   );
 }

@@ -105,7 +105,7 @@ export default function GetPro() {
   const currentPlan = plans[selectedPlan];
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 flex">
+    <div className="min-h-screen w-full bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 flex">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 ">
         {/* Header Section */}
         <div className="text-center mb-16 animate-fade-in">
