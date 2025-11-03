@@ -89,7 +89,7 @@ Before installation, ensure you have:
 ## 🎯 Demo
 
 ### 🌐 Live Demo
-[View Live Demo](admindashboarddam.netlify.app)
+[View Live Demo](https://admindashboarddam.netlify.app/)
 
 ## 📱 Browser Support
 - ✅ Chrome (latest)
