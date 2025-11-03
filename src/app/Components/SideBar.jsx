@@ -134,7 +134,7 @@ export default function SideBar() {
   });
 
   return (
-    <div className="w-80 flex flex-col items-center gap-6 bg-white h-screen py-8 sticky top-0 shadow-lg max-xl:hidden">
+    <div className="w-80 flex flex-col items-center gap-6 bg-white h-screen py-8 sticky top-0 shadow-lg max-xl:hidden overflow-y-auto overflow-x-hidden">
       {/* Logo Section */}
       <div className="flex gap-3 items-center mb-4 px-6">
         <img
